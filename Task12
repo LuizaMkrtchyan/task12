@@ -4,14 +4,13 @@ namespace task12
 {
     abstract class Sorting
     {
-        public int[] array= { 1, 4, 5, 7, 23, 56, 89, 45, 2 };
-        public void Sort()
+        public void Sort(int[] array)
         {
-            SortArr();
-            printArr();
+            SortArr(array);
+            printArr(array);
         }
-        public abstract void SortArr();
-        protected void printArr()
+        public abstract void SortArr(int[] array);
+        protected void printArr(int[] array)
         {
             for (int i = 0; i < array.Length; i++)
             {
@@ -22,7 +21,7 @@ namespace task12
     }
     class BubbleSort : Sorting
     {
-        public override void SortArr()
+        public override void SortArr(int[] array)
         {
             int n = array.Length;
             for (int i = 0; i < n - 1; i++)
@@ -41,7 +40,7 @@ namespace task12
     }
     class InsertionSort : Sorting
     {
-        public override void SortArr()
+        public override void SortArr(int[] array)
         {
             int n = array.Length;
             for (int i = 1; i < n; ++i)
@@ -60,7 +59,7 @@ namespace task12
     }
     class SelectionSort : Sorting
     {
-        public override void SortArr()
+        public override void SortArr(int[] array)
         {
             int n = array.Length;
             for (int i = 0; i < n - 1; i++)
@@ -83,17 +82,19 @@ namespace task12
     {
         static void Main(string[] args)
         {
+            int[] array = { 1, 5, 3, 6, 56, 23, 98, 4, 24 };
+
             Console.WriteLine("BubbleSort");
             Sorting ob = new BubbleSort();
-            ob.Sort();
+            ob.Sort(array);
 
             Console.WriteLine("SelectionSort");
             ob = new SelectionSort();
-            ob.Sort();
+            ob.Sort(array);
 
             Console.WriteLine("InsertionSort");
             ob = new InsertionSort();
-            ob.Sort();
+            ob.Sort(array);
         }
     }
 }
