@@ -2,99 +2,124 @@ using System;
 
 namespace task12
 {
-    abstract class Sorting
+    abstract class Sorter
     {
-        public void Sort(int[] array)
+        protected int N = 10;
+        protected int[] ar;
+
+        public void Init()
         {
-            SortArr(array);
-            printArr(array);
+            ar = new int[N];
+            Random r = new Random();
+            for (int i = 0; i < N; i++)
+                ar[i] = r.Next(1, 99);
+            for (int i = 0; i < N; i++)
+                Console.Write(ar[i] + " ");
         }
-        public abstract void SortArr(int[] array);
-        protected void printArr(int[] array)
+
+        public void Output()
         {
-            for (int i = 0; i < array.Length; i++)
-            {
-                Console.Write(array[i]+" ");
-            }
-            Console.WriteLine("\n");
+            for (int i = 0; i < N; i++)
+                Console.Write(ar[i] + " ");
+        }
+
+        public void DoSort() // Template Method
+        {
+            Init();
+            Console.WriteLine();
+            for (int j = N - 1; j > 0; j--)
+                for (int i = 0; i < N - 1; i++)
+                    if (Order(i))
+                        Swap(i);
+            Output();
+            Console.WriteLine();
+        }
+
+        protected abstract void Swap(int index);
+        protected abstract bool Order(int index);
+    }
+
+    class BubbleSorter : Sorter
+    {
+        protected override void Swap(int i)
+        {
+            int temp = ar[i];
+            ar[i] = ar[i + 1];
+            ar[i + 1] = temp;
+        }
+
+        protected override bool Order(int i)
+        {
+            return ar[i] > ar[i + 1];
         }
     }
-    class BubbleSort : Sorting
+    class SelectionSorter : Sorter
     {
-        public override void SortArr(int[] array)
+        protected override void Swap(int index)
         {
-            int n = array.Length;
-            for (int i = 0; i < n - 1; i++)
+            int minIndex = index;
+            for (int i = index + 1; i < N; i++)
             {
-                for (int j = 0; j < n - i - 1; j++)
-                {
-                    if (array[j] > array[j + 1])
-                    {
-                        int temp = array[j];
-                        array[j] = array[j + 1];
-                        array[j + 1] = temp;
-                    }
-                }
+                if (ar[i] < ar[minIndex])
+                    minIndex = i;
             }
+            int temp = ar[minIndex];
+            ar[minIndex] = ar[index];
+            ar[index] = temp;
+        }
+
+        protected override bool Order(int index)
+        {
+            return false;
         }
     }
-    class InsertionSort : Sorting
+    class InsertionSorter : Sorter
     {
-        public override void SortArr(int[] array)
+        protected override void Swap(int index)
         {
-            int n = array.Length;
-            for (int i = 1; i < n; ++i)
+            int temp = ar[index];
+            ar[index] = ar[index + 1];
+            ar[index + 1] = temp;
+        }
+
+        protected override bool Order(int index)
+        {
+            return ar[index] > ar[index + 1];
+        }
+
+        public new void DoSort()
+        {
+            Init();
+            Console.WriteLine();
+            for (int i = 1; i < N; i++)
             {
-                int key = array[i];
+                int key = ar[i];
                 int j = i - 1;
 
-                while (j >= 0 && array[j] > key)
+                while (j >= 0 && ar[j] > key)
                 {
-                    array[j + 1] = array[j];
+                    ar[j + 1] = ar[j];
                     j = j - 1;
                 }
-                array[j + 1] = key;
+                ar[j + 1] = key;
             }
-        }
-    }
-    class SelectionSort : Sorting
-    {
-        public override void SortArr(int[] array)
-        {
-            int n = array.Length;
-            for (int i = 0; i < n - 1; i++)
-            {
-                int minIndex = i;
-                for (int j = i + 1; j < n; j++)
-                {
-                    if (array[j] < array[minIndex])
-                    {
-                        minIndex = j;
-                    }
-                }
-                int temp = array[minIndex];
-                array[minIndex] = array[i];
-                array[i] = temp;
-            }
+            Output();
+            Console.WriteLine();
         }
     }
     class Program
     {
         static void Main(string[] args)
         {
-            int[] array = { 1, 5, 3, 6, 56, 23, 98, 4, 24 };
-
-            Console.WriteLine("BubbleSort");
-            Sorting ob = new BubbleSort();
-            ob.Sort(array);
-
-            Console.WriteLine("SelectionSort");
-            ob = new SelectionSort();
-            ob.Sort(array);
-
-            Console.WriteLine("InsertionSort");
-            ob = new InsertionSort();
-            ob.Sort(array);
+            Console.WriteLine("BuubleSort");
+            Sorter ob = new BubbleSorter();
+            ob.DoSort();
+            Console.WriteLine("\nInsertionSort");
+            ob = new InsertionSorter();
+            ob.DoSort();
+            Console.WriteLine("\nSelectionSort");
+            ob = new SelectionSorter();
+            ob.DoSort();
         }
     }
 }
