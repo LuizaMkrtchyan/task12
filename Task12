@@ -1,125 +1,221 @@
 using System;
 
-namespace task12
+abstract class Sorter
 {
-    abstract class Sorter
+    //for Bub and Sel
+    protected int key = 0;
+    //For Sel
+    protected int minVal = 0;
+    protected int minIndex = 0;
+
+    public void Sort(ref int[] arr)
     {
-        protected int N = 10;
-        protected int[] ar;
-
-        public void Init()
+        for (int i = 1; i < arr.Length; i++)
         {
-            ar = new int[N];
-            Random r = new Random();
-            for (int i = 0; i < N; i++)
-                ar[i] = r.Next(1, 99);
-            for (int i = 0; i < N; i++)
-                Console.Write(ar[i] + " ");
-        }
+            minIndex = i - 1;
+            minVal = arr[i - 1];
 
-        public void Output()
-        {
-            for (int i = 0; i < N; i++)
-                Console.Write(ar[i] + " ");
-        }
-
-        public void DoSort() // Template Method
-        {
-            Init();
-            Console.WriteLine();
-            for (int j = N - 1; j > 0; j--)
-                for (int i = 0; i < N - 1; i++)
-                    if (Order(i))
-                        Swap(i);
-            Output();
-            Console.WriteLine();
-        }
-
-        protected abstract void Swap(int index);
-        protected abstract bool Order(int index);
-    }
-
-    class BubbleSorter : Sorter
-    {
-        protected override void Swap(int i)
-        {
-            int temp = ar[i];
-            ar[i] = ar[i + 1];
-            ar[i + 1] = temp;
-        }
-
-        protected override bool Order(int i)
-        {
-            return ar[i] > ar[i + 1];
-        }
-    }
-    class SelectionSorter : Sorter
-    {
-        protected override void Swap(int index)
-        {
-            int minIndex = index;
-            for (int i = index + 1; i < N; i++)
+            for (int j = GetJ(i); Check(j, arr) && CheckForInsertion(key, arr[j]); JStep(ref j))
             {
-                if (ar[i] < ar[minIndex])
-                    minIndex = i;
+                try { key = arr[j + 1]; }
+                catch { key = 0; }
+                if (CondForSelectionAndBubble(arr[j], key, minVal))
+                {
+                    SwapForBubbleAndInsertion(j - 1, j, ref arr);
+                    //for Selection
+                    minVal = arr[j];
+                    minIndex = j;
+                }
             }
-            int temp = ar[minIndex];
-            ar[minIndex] = ar[index];
-            ar[index] = temp;
+            SwapForSelection(i - 1, minIndex, ref arr);
         }
+        Output(arr);
+    }
+    public void Output(int[] arr)
+    {
+        for (int i = 0; i < arr.Length; i++)
+        {
+            Console.Write(arr[i] + " ");
+        }
+        Console.WriteLine("\n");
+    }
 
-        protected override bool Order(int index)
+    //For Second Loop Values
+    protected abstract int GetJ(int i);
+    protected abstract void JStep(ref int j);
+    protected abstract bool Check(int j, int[] arr);
+
+    //Specific parts of each
+    protected abstract bool CondForSelectionAndBubble(int i, int j, int z);
+    protected abstract void SwapForBubbleAndInsertion(int i, int j, ref int[] arr);
+    protected abstract bool CheckForInsertion(int i, int j);
+    protected abstract void SwapForSelection(int i, int j, ref int[] arr);
+}
+class BubbleSort : Sorter
+{
+    protected override int GetJ(int i)
+    {
+        return 0;
+    }
+    protected override bool Check(int j, int[] arr)
+    {
+        if (j < arr.Length - 1)
+        {
+            return true;
+        }
+        else
         {
             return false;
         }
     }
-    class InsertionSorter : Sorter
+    protected override void JStep(ref int j)
     {
-        protected override void Swap(int index)
+        j++;
+    }
+    protected override bool CondForSelectionAndBubble(int item1, int item2, int k)
+    {
+        if (item1 > item2)
         {
-            int temp = ar[index];
-            ar[index] = ar[index + 1];
-            ar[index + 1] = temp;
+            return true;
         }
-
-        protected override bool Order(int index)
+        else
         {
-            return ar[index] > ar[index + 1];
-        }
-
-        public new void DoSort()
-        {
-            Init();
-            Console.WriteLine();
-            for (int i = 1; i < N; i++)
-            {
-                int key = ar[i];
-                int j = i - 1;
-
-                while (j >= 0 && ar[j] > key)
-                {
-                    ar[j + 1] = ar[j];
-                    j = j - 1;
-                }
-                ar[j + 1] = key;
-            }
-            Output();
-            Console.WriteLine();
+            return false;
         }
     }
-    class Program
+    protected override void SwapForBubbleAndInsertion(int index1, int index2, ref int[] arr)
+    {
+        int temp = arr[index1];
+        arr[index1] = arr[index2];
+        arr[index2] = temp;
+    }
+    protected override void SwapForSelection(int index1, int index2, ref int[] arr)
+    {
+        return;
+    }
+    protected override bool CheckForInsertion(int i, int j)
+    {
+        return true;
+    }
+}
+class InsertionSort : Sorter
+{
+    protected override int GetJ(int i)
+    {
+        return i;
+    }
+    protected override bool Check(int j, int[] arr)
+    {
+        try { key = arr[j - 1]; } 
+        catch { key = 0; }
+        if (j > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    protected override void JStep(ref int j)
+    {
+        j--;
+    }
+    protected override bool CheckForInsertion(int i, int j)
+    {
+        if (i > j)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    protected override void SwapForBubbleAndInsertion(int index1, int index2, ref int[] arr)
+    {
+        int temp = arr[index1];
+        arr[index1] = arr[index2];
+        arr[index2] = temp;
+    }
+    protected override bool CondForSelectionAndBubble(int item1, int item2, int k)
+    {
+        return true;
+    }
+    protected override void SwapForSelection(int item1, int item2, ref int[] arr)
+    {
+        return;
+    }
+}
+class SelectionSort : Sorter
+{
+    protected override int GetJ(int i)
+    {
+        return i;
+    }
+    protected override bool Check(int j, int[] arr)
+    {
+        if (j < arr.Length)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    protected override void JStep(ref int j)
+    {
+        j++;
+    }
+    protected override bool CondForSelectionAndBubble(int item2, int k, int item1)
+    {
+        if (item1 > item2)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    protected override void SwapForSelection(int index1, int index2, ref int[] arr)
+    {
+        int temp = arr[index1];
+        arr[index1] = arr[index2];
+        arr[index2] = temp;
+    }
+    protected override void SwapForBubbleAndInsertion(int index1, int index2, ref int[] arr)
+    {
+        return;
+    }
+    protected override bool CheckForInsertion(int i, int j)
+    {
+        return true;
+    }
+}
+class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("BuubleSort");
-            Sorter ob = new BubbleSorter();
-            ob.DoSort();
+            int[] arr = { 7, 430, 35, 44, 32, 13, 80, 2, 23 };
+            Sorter ob = new InsertionSort();
+
+            Console.WriteLine("Initial Array");
+            ob.Output(arr);
+
             Console.WriteLine("\nInsertionSort");
-            ob = new InsertionSorter();
-            ob.DoSort();
+            ob.Sort(ref arr);
+
+            Console.WriteLine("\nBubbleSort");
+            ob = new BubbleSort();
+            ob.Sort(ref arr);
+
             Console.WriteLine("\nSelectionSort");
-            ob = new SelectionSorter();
-            ob.DoSort();
+            ob = new SelectionSort();
+            ob.Sort(ref arr);
+
         }
     }
-}
+
+
